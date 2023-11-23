@@ -1,7 +1,6 @@
 # smart_home_remote_app
 
-A new Flutter project.
-
+Smarthome remote App
 ## Getting Started
 
 This project is a starting point for a Flutter application.
