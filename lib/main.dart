@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/screen/home.dart';
+import 'package:smart_home_remote_app/dbHelper/mongodb.dart';
+import 'package:smart_home_remote_app/screen/splash_home.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await MongoDatabase.connect();
   runApp(const MyApp());
 }
 
@@ -19,7 +22,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColor.bgColor,
         fontFamily: "Poppins"
       ),
-      home: const Home(),
+      home: SplashHome(title: 'Smart Home App',),
     );
   }
 }

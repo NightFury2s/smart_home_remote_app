@@ -12,13 +12,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  
+  bool isLoggedIn = false;
+
   @override
   Widget build(BuildContext context) {
 
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      drawer: CustomDrawer(),
+      drawer: CustomDrawer(isLoggedIn: isLoggedIn),
       body: SafeArea(
         child: Column(
           children: [
