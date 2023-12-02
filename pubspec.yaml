@@ -1,4 +1,4 @@
-name: smart_home_remote_app
+name: IntelliHome
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -36,6 +36,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   mongo_dart: ^0.9.3
+  firebase_core: ^2.24.0
+  cloud_firestore: ^4.13.3
+  firebase_auth: ^4.15.0
+  firebase_storage: ^11.5.3
+  firebase_core_dart: ^1.0.1
+  fluttertoast: ^8.2.4
+  shared_preferences: ^2.2.2
+  ionicons: ^0.2.2
 
 dev_dependencies:
   flutter_test:

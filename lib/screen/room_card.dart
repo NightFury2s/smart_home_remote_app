@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/model/smart_home_model.dart';
-import 'package:smart_home_remote_app/screen/room_controller.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/model/smart_home_model.dart';
+import 'package:IntelliHome/screen/room_controller.dart';
 
 class RoomCard extends StatelessWidget {
   const RoomCard({super.key, required this.roomData});

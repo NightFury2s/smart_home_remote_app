@@ -1,4 +1,0 @@
-#Mon Nov 27 10:01:03 ICT 2023
-base.0=D\:\\IT\\NCKH\\smart_home_remote_app\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
-path.0=classes.dex
-renamed.0=classes.dex

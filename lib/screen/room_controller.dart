@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/model/smart_home_model.dart';
-import 'package:smart_home_remote_app/screen/widgets/devices_switch.dart';
-import 'package:smart_home_remote_app/screen/widgets/glass_morphism.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/model/smart_home_model.dart';
+import 'package:IntelliHome/screen/widgets/devices_switch.dart';
+import 'package:IntelliHome/screen/widgets/glass_morphism.dart';
 
 class RoomController extends StatefulWidget {
   const RoomController({super.key, required this.roomData});
@@ -22,8 +22,8 @@ class _RoomControllerState extends State<RoomController> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      
-      // NAVIGATION BAR
+
+       // NAVIGATION BAR
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

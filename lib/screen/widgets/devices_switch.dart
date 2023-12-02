@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/model/smart_home_model.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/model/smart_home_model.dart';
 
 class DeviceSwitch extends StatefulWidget {
   const DeviceSwitch({super.key, required this.data});
@@ -26,6 +26,7 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
         });
       },
       child: Container(
+
         // DEVICES SWITCH
         width: size.width * 0.24,
         margin: EdgeInsets.symmetric(
@@ -87,6 +88,7 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
     );
   }
 
+  // DEVICE NAME
   Container _deviceName(Size size, DeviceInRoom data) {
     return Container(
           margin: EdgeInsets.all(8.0),
@@ -108,14 +110,14 @@ class _DeviceSwitchState extends State<DeviceSwitch> {
 
   Padding _deviceStatus(DeviceInRoom data) {
     return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            data.deviceStatus ? "ON" : "OFF",
-            style: TextStyle(
-              color: AppColor.white,
-              fontWeight: FontWeight.w300
-            ),
-          ),
-        );
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        data.deviceStatus ? "ON" : "OFF",
+        style: TextStyle(
+          color: AppColor.white,
+          fontWeight: FontWeight.w300
+        ),
+      ),
+    );
   }
 }

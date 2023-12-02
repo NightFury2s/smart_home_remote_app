@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
 
 class GlassMorphism extends StatelessWidget {
   const GlassMorphism({super.key, required this.child});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-// import 'package:smart_home_remote_app/screen/Auth/Login/login_page.dart';
-import 'package:smart_home_remote_app/screen/home.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+// import 'package:IntelliHome/screen/Auth/Login/login_page.dart';
+import 'package:IntelliHome/screen/home.dart';
 
 class SplashHome extends StatefulWidget {
   const SplashHome({Key? key, required this.title}) : super(key: key);

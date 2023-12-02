@@ -1,19 +1,86 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/screen/Auth/Login/login_page.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/global/common/toast.dart';
+// import 'package:IntelliHome/screen/Auth/Login/login_page.dart';
 
 class CustomDrawer extends StatefulWidget {
-  final bool isLoggedIn; // Biến kiểm tra trạng thái đăng nhập
-  const CustomDrawer({Key? key, required this.isLoggedIn}) : super(key: key);
+  const CustomDrawer({Key? key}) : super(key: key);
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
+  late User? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
+  Future<void> getCurrentUser() async {
+    currentUser = FirebaseAuth.instance.currentUser;
+    setState(() {});
+  }
+
+  Future<void> signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Hiển thị thông báo khi đăng xuất thành công
+      // showSignOutMessage();
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      print('Error signing out: $e');
+    }
+  }
+
+  
+  Future<void> setting() async {
+    try {
+      // Hiển thị thông báo khi đăng xuất thành công
+      // showSignOutMessage();
+      Navigator.pushReplacementNamed(context, '/setting');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+  // void showSignOutMessage() {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: AppColor.black.withOpacity(0.5),
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(10),
+  //         side: BorderSide(color: AppColor.black),
+  //       ),
+  //       content: Text('Bạn đã đăng xuất!'),
+  //       duration: Duration(seconds: 3), // Thời gian hiển thị thông báo
+  //     ),
+  //   );
+  // }
+
+  Widget _buildUserInfoOrLoginButton() {
+    if (currentUser != null) {
+      return Text(
+        currentUser!.displayName ?? 'Guest',
+        style: TextStyle(color: AppColor.white),
+      );
+    } else {
+      return ElevatedButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/login');
+        },
+        child: Text('Đăng nhập'),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    Widget userInfoOrLoginButton = _buildUserInfoOrLoginButton();
 
     return SafeArea(
       child: Drawer(
@@ -67,61 +134,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ),
                   ),
                   SizedBox(width: 10),
-                  // Hiển thị thông tin tùy thuộc vào trạng thái đăng nhập
-                  if (widget.isLoggedIn)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Xin chào, user!",
-                          style: TextStyle(
-                            color: AppColor.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        OutlinedButton(
-                          onPressed: () {
-                            // Điều hướng đến trang chỉnh sửa profile khi nhấn nút
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColor.white,
-                            side: BorderSide(color: AppColor.white),
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            "Edit profile",
-                            style: TextStyle(
-                              color: AppColor.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  // Nút đăng nhập khi chưa đăng nhập
-                  if (!widget.isLoggedIn)
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginPage(),
-                          ),
-                        );
-                      },
-                      child: Text('Đăng nhập'),
-                    ),
+                  userInfoOrLoginButton,
                 ],
               ),
               Divider(
@@ -129,13 +142,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 color: AppColor.white,
                 height: 40,
               ),
-              drawerTile(Icons.people_alt_outlined, "Quản lý Users", () {}),
-              drawerTile(Icons.tv_outlined, "Các thiết bị", () {}),
-              drawerTile(Icons.bed_rounded, "Phòng", () {}),
-              drawerTile(Icons.settings, "Cài đặt", () {}),
-              drawerTile(Icons.help_outline, "Trợ giúp", () {}),
+              drawerTile(Icons.people_alt_outlined, " Quản lý Users", () {}),
+              drawerTile(Icons.tv_outlined, " Các thiết bị", () {}),
+              drawerTile(Icons.bed_rounded, " Phòng", () {}),
+              drawerTile(Icons.settings, " Cài đặt", () {
+                setting();
+              }),
+              drawerTile(Icons.help_outline, " Trợ giúp", () {}),
               Spacer(),
-              drawerTile(Icons.power_settings_new_outlined, "Đăng xuất", () {}),
+              if (currentUser != null)
+                drawerTile(Icons.power_settings_new_outlined, " Đăng xuất", () {
+                  signOut();
+                  showToast(message: "Bạn đã đăng xuất");
+                }),
             ],
           ),
         ),
@@ -143,8 +162,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  ListTile drawerTile(
-    IconData icon, String title, VoidCallback ontap) {
+  ListTile drawerTile(IconData icon, String title, VoidCallback ontap) {
     return ListTile(
       onTap: ontap,
       contentPadding: EdgeInsets.zero,

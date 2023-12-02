@@ -1,8 +1,34 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/global/common/toast.dart';
+import 'package:IntelliHome/screen/Auth/firebase_auth_implementation/firebase_auth_services.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+
+  final FirebaseAuthService _auth = FirebaseAuthService();
+
+  // CONTROLLER FOR USERNAME AND PASSWORD
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  bool isSinging = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +95,7 @@ class RegisterPage extends StatelessWidget {
                           ],
                         ),
                         child: TextField(
+                          controller: _usernameController,
                           cursorColor: Color(0xffF5591F),
                           decoration: InputDecoration(
                             hintText: "Tên đăng nhập",
@@ -95,6 +122,7 @@ class RegisterPage extends StatelessWidget {
                           ],
                         ),
                         child: TextField(
+                          controller: _emailController,
                           cursorColor: Color(0xffF5591F),
                           decoration: InputDecoration(
                             hintText: "example@gmail.com",
@@ -121,6 +149,7 @@ class RegisterPage extends StatelessWidget {
                           ],
                         ),
                         child: TextField(
+                          controller: _passwordController,
                           cursorColor: Color(0xffF5591F),
                           decoration: InputDecoration(
                             hintText: "Mật khẩu",
@@ -148,7 +177,8 @@ class RegisterPage extends StatelessWidget {
                       // BUTTON REGISTER
                       GestureDetector(
                         onTap: () {
-                          // Write Click Listener Code Here.
+                          _signUp();
+                          showToast(message: "Tạo tài khoản thành công!");
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -165,7 +195,7 @@ class RegisterPage extends StatelessWidget {
                                   color: Color(0xffEEEEEE)),
                             ],
                           ),
-                          child: Text(
+                          child: isSinging ? CircularProgressIndicator(color: Colors.white) : Text(
                             "Đăng ký",
                             style: TextStyle(color: Colors.white),
                           ),
@@ -202,77 +232,6 @@ class RegisterPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(top: 20, bottom: 40),
-                        child: Text(
-                          "Hoặc đăng nhập",
-                          style: TextStyle(color: AppColor.grey),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // REGISTER WITH SOCIAL MEDIA
-                Container(
-                  margin: EdgeInsets.only(bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          print('Facebook');
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          margin: EdgeInsets.only(left: 5, right: 5),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                  'https://cdn-icons-png.flaticon.com/512/889/889102.png?w=740&t=st=1669283662~exp=1669284262~hmac=43343dd3e314effcc6da8b8d469baf0973dfe9d139c2d30f849795717cd40163',
-                                ),
-                                fit: BoxFit.cover),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          print('Instagram');
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          margin: EdgeInsets.only(left: 5, right: 5),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                  'https://img.freepik.com/free-icon/instagram_318-566741.jpg?size=338&ext=jpg&uid=R40945684&ga=GA1.2.1864726488.1662655660&semt=sph',
-                                ),
-                                fit: BoxFit.cover),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          print('Twitter');
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          margin: EdgeInsets.only(left: 5, right: 5),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                  'https://img.freepik.com/free-icon/twitter_318-764740.jpg?size=338&ext=jpg&uid=R40945684&ga=GA1.2.1864726488.1662655660&semt=sph',
-                                ),
-                                fit: BoxFit.cover),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -282,5 +241,40 @@ class RegisterPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // FUNCTION FOR SIGN UP
+  void _signUp() async {
+    setState(() {
+      isSinging = true;
+    });
+
+    // ignore: unused_local_variable
+    String username = _usernameController.text;
+    String email = _emailController.text;
+    String password = _passwordController.text;
+    // CHECK LOGIN SUCCESS OR NOT
+    try {
+      User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+      setState(() {
+        isSinging = false;
+      });
+
+      if (user != null) {
+        showToast(message: "Bạn đã đăng nhập thành công.");
+        Navigator.pushNamed(context, '/home');
+      } else {
+        // showToast(message: "Đã có lỗi xảy ra. Vui lòng thử lại.");
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        // Handle FirebaseAuthException codes and error messages
+        print("FirebaseAuthException during sign up: ${e.message}");
+      } else {
+        // Handle other unexpected exceptions
+        print("Unexpected error during sign up: $e");
+      }
+    }
   }
 }

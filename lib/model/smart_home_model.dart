@@ -170,6 +170,18 @@ List<SmartHomeModel> smartHomeData = [
         iconOff: Icons.lightbulb_outline_rounded,
         deviceStatus: true,
       ),
+      DeviceInRoom(
+        deviceName: "Fan",
+        iconOn: Icons.air,
+        iconOff: Icons.mode_fan_off_outlined,
+        deviceStatus: true,
+      ),
+      DeviceInRoom(
+        deviceName: "AC",
+        iconOn: Icons.ac_unit,
+        iconOff: Icons.thermostat,
+        deviceStatus: true,
+      ),
     ],
   ),
 ];

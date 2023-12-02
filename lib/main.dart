@@ -1,11 +1,21 @@
+import 'package:IntelliHome/screen/SettingPage/setting_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_home_remote_app/constants/app_colors.dart';
-import 'package:smart_home_remote_app/dbHelper/mongodb.dart';
-import 'package:smart_home_remote_app/screen/splash_home.dart';
+import 'package:IntelliHome/constants/app_colors.dart';
+import 'package:IntelliHome/screen/Auth/Login/login_page.dart';
+import 'package:IntelliHome/screen/Auth/Register/register_page.dart';
+import 'package:IntelliHome/screen/home.dart';
+// import 'package:IntelliHome/dbHelper/mongodb.dart';
+import 'package:IntelliHome/screen/splash_home.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoDatabase.connect();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // await MongoDatabase.connect();
   runApp(const MyApp());
 }
 
@@ -16,13 +26,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Smart home remote',
+      title: 'IntelliHome',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: AppColor.bgColor,
         fontFamily: "Poppins"
       ),
-      home: SplashHome(title: 'Smart Home App',),
+      routes: {
+        '/home': (context) => Home(),
+        '/login': (context) => LoginPage(),
+        '/signup': (context) => RegisterPage(),
+        '/setting': (context) => SettingPage(),
+      },
+      home: SplashHome(title: 'Smart Home App'),
     );
   }
 }
