@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:IntelliHome/constants/app_colors.dart';
 import 'package:IntelliHome/global/common/toast.dart';
-import 'package:IntelliHome/screen/Auth/firebase_auth_implementation/firebase_auth_services.dart';
+// import 'package:IntelliHome/screen/Auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,17 +14,21 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
 
-  final FirebaseAuthService _auth = FirebaseAuthService();
+  // FIREBASE AUTHENTICATION SERVICE INSTANCE
+  // final FirebaseAuthService _auth = FirebaseAuthService();
 
-  // CONTROLLER FOR USERNAME AND PASSWORD
+  // TEXT EDITING CONTROLLERS FOR USERNAME, EMAIL, AND PASSWORD
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  bool isSinging = false;
+  // INDICATE USER SIGNING PROCESS AND PASSWORD VISIBILITY
+  bool isSigning = false;
+  bool isObscure = true;
 
   @override
   void dispose() {
+    // DISPOSE TEXT EDITING CONTROLLERS WHEN NOT NEEDED
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -89,9 +94,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: Colors.grey[200],
                           boxShadow: [
                             BoxShadow(
-                                offset: Offset(0, 10),
-                                blurRadius: 50,
-                                color: Color(0xffEEEEEE)),
+                              offset: Offset(0, 10),
+                              blurRadius: 50,
+                              color: Color(0xffEEEEEE)
+                            ),
                           ],
                         ),
                         child: TextField(
@@ -143,19 +149,40 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: Colors.grey[200],
                           boxShadow: [
                             BoxShadow(
-                                offset: Offset(0, 10),
-                                blurRadius: 50,
-                                color: Color(0xffEEEEEE)),
+                              offset: Offset(0, 10),
+                              blurRadius: 50,
+                              color: Color(0xffEEEEEE)
+                            ),
                           ],
                         ),
-                        child: TextField(
-                          controller: _passwordController,
-                          cursorColor: Color(0xffF5591F),
-                          decoration: InputDecoration(
-                            hintText: "Mật khẩu",
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
+
+                        // SHOW/HIDE PASSWORD
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _passwordController,
+                                cursorColor: Color(0xffF5591F),
+                                decoration: InputDecoration(
+                                  hintText: "Mật khẩu",
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                obscureText: isObscure,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                isObscure ? Icons.visibility_off : Icons.visibility,
+                                color: AppColor.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isObscure = !isObscure;
+                                });
+                              },
+                            )
+                          ],
                         ),
                       ),
 
@@ -178,7 +205,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       GestureDetector(
                         onTap: () {
                           _signUp();
-                          showToast(message: "Tạo tài khoản thành công!");
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -195,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   color: Color(0xffEEEEEE)),
                             ],
                           ),
-                          child: isSinging ? CircularProgressIndicator(color: Colors.white) : Text(
+                          child: isSigning ? CircularProgressIndicator(color: Colors.white) : Text(
                             "Đăng ký",
                             style: TextStyle(color: Colors.white),
                           ),
@@ -243,38 +269,55 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // FUNCTION FOR SIGN UP
+  // FUNCTION TO HANDLE USER SIGN UP
   void _signUp() async {
+    // INDICATE SIGN UP PROCESS STARTED
     setState(() {
-      isSinging = true;
+      isSigning = true;
     });
 
-    // ignore: unused_local_variable
+    // RETRIEVE USER INPUTS FOR USERNAME, EMAIL, AND PASSWORD
     String username = _usernameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
-    // CHECK LOGIN SUCCESS OR NOT
-    try {
-      User? user = await _auth.signInWithEmailAndPassword(email, password);
 
+    // CHECK IF FIELDS ARE NOT EMPTY BEFORE SIGNING UP
+    if (username.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+      try {
+        
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        // ATTEMPT TO SIGN UP USER WITH EMAIL AND PASSWORD
+        User? user = userCredential.user;
+
+        // MARK SIGN UP PROCESS AS COMPLETED
+        setState(() {
+          isSigning = false;
+        });
+
+        // REDIRECT TO HOME SCREEN IF SIGN UP IS SUCCESSFUL
+        if (user != null) {
+          showToast(message: "Tạo tài khoản thành công");
+
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'username': username,
+          });
+          Navigator.pushNamed(context, '/home');
+        } else {
+          // HANDLE FAILURE OR ERROR IN SIGN UP PROCESS
+        }
+      } catch (e) {
+        // HANDLE EXCEPTIONS IF NECESSARY
+      }
+    } else {
+      // SHOW ERROR MESSAGE IF FIELDS ARE EMPTY AND ABORT SIGN UP
+      showToast(message: "Vui lòng điền đầy đủ thông tin.");
       setState(() {
-        isSinging = false;
+        isSigning = false;
       });
-
-      if (user != null) {
-        showToast(message: "Bạn đã đăng nhập thành công.");
-        Navigator.pushNamed(context, '/home');
-      } else {
-        // showToast(message: "Đã có lỗi xảy ra. Vui lòng thử lại.");
-      }
-    } catch (e) {
-      if (e is FirebaseAuthException) {
-        // Handle FirebaseAuthException codes and error messages
-        print("FirebaseAuthException during sign up: ${e.message}");
-      } else {
-        // Handle other unexpected exceptions
-        print("Unexpected error during sign up: $e");
-      }
     }
   }
 }

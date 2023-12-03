@@ -16,15 +16,19 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final FirebaseAuthService _auth = FirebaseAuthService();
 
-  // CONTROLLER FOR USERNAME AND PASSWORD
-  // TextEditingController _usernameController = TextEditingController();
+  // INITIALIZING TEXT EDITING CONTROLLERS FOR EMAIL AND PASSWORD FIELDS
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
+  // INDICATE LOGIN STATUS
   bool isLogging = false;
+
+  // CONTROL PASSWORD OBSCURITY
+  bool isObscure = true;
 
   @override
   void dispose() {
+    // DISPOSING TEXT EDITING CONTROLLERS TO FREE UP RESOURCES
     // _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -82,7 +86,8 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Vui lòng đăng nhập để sử dụng ứng dụng',
                         style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w300),
+                          fontSize: 15, fontWeight: FontWeight.w300
+                        ),
                       ),
 
                       // INPUT EMAIL
@@ -96,9 +101,10 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.grey[200],
                           boxShadow: [
                             BoxShadow(
-                                offset: Offset(0, 10),
-                                blurRadius: 50,
-                                color: Color(0xffEEEEEE)),
+                              offset: Offset(0, 10),
+                              blurRadius: 50,
+                              color: Color(0xffEEEEEE)
+                            ),
                           ],
                         ),
                         child: TextField(
@@ -123,19 +129,40 @@ class _LoginPageState extends State<LoginPage> {
                           color: Colors.grey[200],
                           boxShadow: [
                             BoxShadow(
-                                offset: Offset(0, 10),
-                                blurRadius: 50,
-                                color: Color(0xffEEEEEE)),
+                              offset: Offset(0, 10),
+                              blurRadius: 50,
+                              color: Color(0xffEEEEEE)
+                            ),
                           ],
                         ),
-                        child: TextField(
-                          controller: _passwordController,
-                          cursorColor: Color(0xffF5591F),
-                          decoration: InputDecoration(
-                            hintText: "Mật khẩu",
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _passwordController,
+                                cursorColor: Color(0xffF5591F),
+                                decoration: InputDecoration(
+                                  hintText: "Mật khẩu",
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                obscureText: isObscure,
+                              ),
+                            ),
+
+                            // SHOW/HIDE PASSWORD
+                            IconButton(
+                              icon: Icon(
+                                isObscure ? Icons.visibility_off : Icons.visibility,
+                                color: AppColor.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  isObscure = !isObscure;
+                                });
+                              },
+                            )
+                          ],
                         ),
                       ),
 
@@ -174,11 +201,11 @@ class _LoginPageState extends State<LoginPage> {
                             ],
                           ),
                           child: isLogging
-                              ? CircularProgressIndicator(color: Colors.white)
-                              : Text(
-                                  "Đăng nhập",
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              "Đăng nhập",
+                              style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
 
@@ -217,42 +244,52 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // FUNCTION TO HANDLE USER LOGIN
   void _logIn() async {
-    // CHECK IF USERNAME OR PASSWORD IS EMPTY
+    // INDICATE START OF LOGIN PROCESS
     setState(() {
       isLogging = true;
     });
 
-    // String username = _usernameController.text;
+    // RETRIEVE USER INPUTS FOR EMAIL AND PASSWORD
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    // CHECK LOGIN SUCCESS OR NOT
-    try {
-      User? user = await _auth.signInWithEmailAndPassword(email, password);
+    // CHECK IF FIELDS ARE NOT EMPTY BEFORE LOGGING IN
+    if (email.isNotEmpty && password.isNotEmpty) {
+      try {
+        // ATTEMPT USER LOGIN WITH PROVIDED EMAIL AND PASSWORD
+        User? user = await _auth.signInWithEmailAndPassword(email, password);
 
+        // MARK LOGIN PROCESS AS COMPLETED
+        setState(() {
+          isLogging = false;
+        });
+
+        // REDIRECT TO HOME SCREEN IF LOGIN IS SUCCESSFUL
+        if (user != null) {
+          showToast(message: "Đăng nhập thành công");
+          // SAVE LOGIN STATE TO SHAREDPREFERENCES
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setBool('isLogin', true);
+          // REDIRECT TO HOME SCREEN AFTER SUCCESSFUL LOGIN
+          Navigator.pushNamed(context, '/home');
+        } else {
+          // HANDLE LOGIN FAILURE OR ERROR
+          // For example:
+          // showToast(message: "AN ERROR OCCURRED DURING LOGIN. PLEASE TRY AGAIN.");
+        }
+      } catch (e) {
+        // HANDLE EXCEPTIONS IF NECESSARY
+        // For example:
+        // print("Exception during login: $e");
+      }
+    } else {
+      // SHOW ERROR MESSAGE IF FIELDS ARE EMPTY AND ABORT LOGIN
+      showToast(message: "Vui lòng điền đầy đủ thông tin.");
       setState(() {
         isLogging = false;
       });
-
-      if (user != null) {
-        showToast(message: "Bạn đã đăng nhập thành công.");
-
-        // LƯU TRẠNG THÁI ĐĂNG NHẬP VÀO SHAREDPREFERENCE
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setBool('isLogin', true);
-        Navigator.pushNamed(context, '/home');
-      } else {
-        // showToast(message: "Đã có lỗi xảy ra. Vui lòng thử lại.");
-      }
-    } catch (e) {
-      if (e is FirebaseAuthException) {
-        // Handle FirebaseAuthException codes and error messages
-        print("FirebaseAuthException during sign up: ${e.message}");
-      } else {
-        // Handle other unexpected exceptions
-        print("Unexpected error during sign up: $e");
-      }
     }
   }
 }

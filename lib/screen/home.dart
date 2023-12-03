@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:IntelliHome/constants/app_colors.dart';
 import 'package:IntelliHome/model/smart_home_model.dart';
@@ -12,12 +14,35 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  
+  // INITIALIZE USERNAME VARIABLE
+  late String username = '';
+  // TRACK USER'S LOGIN STATUS
   bool isLoggedIn = false;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    // CALL FUNCTION TO RETRIEVE USERNAME
+    getUsername();
+  }
 
+  // FETCH USERNAME FROM FIRESTORE
+  Future<void> getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        username = userSnapshot['username'] ?? '';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -109,7 +134,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Xin chào user!",
+                          username,
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w600

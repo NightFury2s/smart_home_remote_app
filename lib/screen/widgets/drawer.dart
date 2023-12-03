@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:IntelliHome/constants/app_colors.dart';
 import 'package:IntelliHome/global/common/toast.dart';
-// import 'package:IntelliHome/screen/Auth/Login/login_page.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -12,60 +12,67 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  late User? currentUser;
+  // INITIALIZE USERNAME VARIABLE
+  late String username = '';
 
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
+    // CALL FUNCTION TO RETRIEVE USERNAME
+    getUsername();
   }
 
-  Future<void> getCurrentUser() async {
-    currentUser = FirebaseAuth.instance.currentUser;
-    setState(() {});
+  // FETCH USERNAME FROM FIRESTORE
+  Future<void> getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        username = userSnapshot['username'] ?? '';
+      });
+    }
   }
 
+  // SIGN OUT USER FROM APP
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Hiển thị thông báo khi đăng xuất thành công
-      // showSignOutMessage();
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       print('Error signing out: $e');
     }
   }
-
   
+  // NAVIGATE TO SETTING SCREEN
   Future<void> setting() async {
     try {
-      // Hiển thị thông báo khi đăng xuất thành công
-      // showSignOutMessage();
       Navigator.pushReplacementNamed(context, '/setting');
     } catch (e) {
       print('Error: $e');
     }
   }
-  // void showSignOutMessage() {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       behavior: SnackBarBehavior.floating,
-  //       backgroundColor: AppColor.black.withOpacity(0.5),
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(10),
-  //         side: BorderSide(color: AppColor.black),
-  //       ),
-  //       content: Text('Bạn đã đăng xuất!'),
-  //       duration: Duration(seconds: 3), // Thời gian hiển thị thông báo
-  //     ),
-  //   );
-  // }
 
+  // BUILD USER INFO OR LOGIN BUTTON
   Widget _buildUserInfoOrLoginButton() {
-    if (currentUser != null) {
-      return Text(
-        currentUser!.displayName ?? 'Guest',
-        style: TextStyle(color: AppColor.white),
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Welcome,',
+            style: TextStyle(color: AppColor.white),
+          ),
+          SizedBox(height: 5),
+          Text(
+            username,
+            style: TextStyle(color: AppColor.white, fontWeight: FontWeight.bold),
+          ),
+        ],
       );
     } else {
       return ElevatedButton(
@@ -116,6 +123,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ],
               ),
+
+              // DISPLAY AVATAR
               Row(
                 children: [
                   Container(
@@ -150,7 +159,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               }),
               drawerTile(Icons.help_outline, " Trợ giúp", () {}),
               Spacer(),
-              if (currentUser != null)
+              if (FirebaseAuth.instance.currentUser != null)
                 drawerTile(Icons.power_settings_new_outlined, " Đăng xuất", () {
                   signOut();
                   showToast(message: "Bạn đã đăng xuất");
@@ -162,6 +171,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
+  // BUILD DRAWER TILE
   ListTile drawerTile(IconData icon, String title, VoidCallback ontap) {
     return ListTile(
       onTap: ontap,

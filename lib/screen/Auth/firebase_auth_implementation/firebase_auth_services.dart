@@ -4,7 +4,7 @@ import 'package:IntelliHome/global/common/toast.dart';
 class FirebaseAuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // HÀM ĐĂNG KÝ BẰNG EMAIL VÀ PASSWORD
+  // SIGN UP FUNCTION
   Future<User?> signUpWithEmailAndPassword(
     String email,
     String password,
@@ -25,7 +25,7 @@ class FirebaseAuthService {
     return null;
   }
 
-  // HÀM ĐĂNG NHẬP BẰNG EMAIL VÀ PASSWORD
+  // LOGIN FUNCTION
   Future<User?> signInWithEmailAndPassword(
     String email,
     String password,

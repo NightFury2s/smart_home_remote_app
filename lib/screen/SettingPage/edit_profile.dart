@@ -1,4 +1,3 @@
-import 'package:IntelliHome/constants/app_colors.dart';
 import 'package:IntelliHome/screen/SettingPage/components/editprofile_item.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
