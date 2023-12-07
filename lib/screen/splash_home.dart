@@ -49,7 +49,7 @@ class _SplashHomeState extends State<SplashHome> {
           ),
           Center(
             child: Container(
-              child: Text("Smart Home App", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white,),),
+              child: Text("IntelliHome", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white,),),
             ),
           ),
         ],

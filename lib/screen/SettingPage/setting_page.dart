@@ -3,6 +3,8 @@ import 'package:IntelliHome/screen/SettingPage/components/forward_button.dart';
 import 'package:IntelliHome/screen/SettingPage/components/setting_item.dart';
 import 'package:IntelliHome/screen/SettingPage/components/setting_switch.dart';
 import 'package:IntelliHome/screen/SettingPage/edit_profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -14,6 +16,32 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  // INITIALIZE USERNAME VARIABLE
+  late String username = '';
+  late String userEmail = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // CALL FUNCTION TO RETRIEVE USERNAME
+    getUsernameAndEmail();
+  }
+  
+  // FETCH USERNAME AND EMAIL FROM FIRESTORE
+  Future<void> getUsernameAndEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        username = userSnapshot['username'] ?? '';
+        userEmail = user.email ?? ''; // Lấy email của người dùng từ Firebase Authentication
+      });
+    }
+  }
 
   bool isDarkMode = false;
   @override
@@ -66,7 +94,7 @@ class _SettingPageState extends State<SettingPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Username",
+                          username,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500
@@ -74,7 +102,7 @@ class _SettingPageState extends State<SettingPage> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "username@gmail.com",
+                          userEmail,
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColor.grey
