@@ -41,7 +41,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       print('Error signing out: $e');
     }
@@ -151,7 +151,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 color: AppColor.white,
                 height: 40,
               ),
-              drawerTile(Icons.people_alt_outlined, " Quản lý Users", () {}),
               drawerTile(Icons.tv_outlined, " Các thiết bị", () {}),
               drawerTile(Icons.bed_rounded, " Phòng", () {}),
               drawerTile(Icons.settings, " Cài đặt", () {
