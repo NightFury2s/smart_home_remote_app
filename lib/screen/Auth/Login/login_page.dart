@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:IntelliHome/constants/app_colors.dart';
 import 'package:IntelliHome/global/common/toast.dart';
-import 'package:IntelliHome/screen/Auth/Register/register_page.dart';
+// import 'package:IntelliHome/screen/Auth/Register/register_page.dart';
 import 'package:IntelliHome/screen/Auth/firebase_auth_implementation/firebase_auth_services.dart';
 
 class LoginPage extends StatefulWidget {
@@ -42,33 +42,6 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          Positioned(
-            top: 45,
-            left: 20,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegisterPage(),
-                  ),
-                );
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.keyboard_arrow_left,
-                  color: AppColor.grey,
-                  size: 30,
-                ),
-              ),
-            ),
-          ),
           Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
